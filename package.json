@@ -1,6 +1,6 @@
 {
     "name": "@znetstar/attic-puppeteer-proxy",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "description": "A plugin for puppeteer-proxy on attic",
     "main": "lib/Atticfile.js",
     "publishConfig": {
@@ -9,7 +9,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "grunt",
-        "prepare": "grunt"
+        "prepare": "grunt",
+        "postpack": "rm -f oclif.manifest.json",
+        "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme"
     },
     "repository": {
         "type": "git",
@@ -27,9 +29,13 @@
         "url": "https://github.com/znetstar/attic-puppeteer-proxy/issues"
     },
     "devDependencies": {
+        "@oclif/dev-cli": "^1.22.2",
+        "@oclif/plugin-help": "^3.2.0",
         "@types/bcrypt": "^3.0.0",
         "@types/mongoose": "^5.10.4",
+        "@types/node": "^14.6.2",
         "@types/node-fetch": "^2.5.8",
+        "@znetstar/attic-cli-common": "^3.0.0",
         "@znetstar/attic-common": "^3.1.0",
         "grunt": "^1.3.0",
         "grunt-contrib-clean": "^2.0.0",
