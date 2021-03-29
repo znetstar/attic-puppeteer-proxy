@@ -1,5 +1,5 @@
-Attic Server WeChat
-Copyright (C) 2021 Etomon, PBC <open-source@etomon.com>
+Attic Puppeteer Proxy
+Copyright (C) 2021 Zachary Boyd <zachary@zacharyboyd.nyc>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by

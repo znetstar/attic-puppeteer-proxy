@@ -1,7 +1,7 @@
 {
     "name": "@znetstar/attic-puppeteer-proxy",
-    "version": "3.0.0",
-    "description": "A plugin for oauth with puppeteer-proxy on attic",
+    "version": "3.0.1",
+    "description": "A plugin for puppeteer-proxy on attic",
     "main": "lib/Atticfile.js",
     "publishConfig": {
         "registry": "https://registry.npmjs.org"
