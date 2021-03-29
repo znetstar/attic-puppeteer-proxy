@@ -13,5 +13,5 @@
     "experimentalDecorators": true,
     "importHelpers": true
   },
-  "files": [ "src/Atticfile.ts" ]
+  "files": [ "src/Atticfile.ts", "src/cli-commands/puppeteer-proxy/store-cookies.ts" ]
 }
