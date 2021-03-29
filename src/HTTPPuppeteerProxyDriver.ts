@@ -38,7 +38,7 @@ export const defaultPDFOptions: PDFOptions = {
 }
 
 export const defaultLocationOptions: HTTPPuppeteerProxyDriverLocationOptions = {
-    exportType: HTTPPuppeteerProxyDriverExportTypes.pdf,
+    exportType: HTTPPuppeteerProxyDriverExportTypes.html,
     pdfOptions: defaultPDFOptions,
     cookieStoreName: 'default'
 }
@@ -53,13 +53,22 @@ export default class HTTPPuppeteerProxyDriverBase implements IDriverGet<IHTTPRes
     constructor(public user?: IUser, protected options: HTTPPuppeteerProxyDriverOptions = HTTPPuppeteerProxyDriverBase.DefaultOptions) {
     }
 
-    public async getCookieStore(name: string, urlInput: string): Promise<IPuppeteerCookieStore|null> {
-        let matchableUrlBase = URL.parse(urlInput);
-        let url = URL.format({
-            host: matchableUrlBase.host,
-            protocol: matchableUrlBase.protocol
+    public async getCookieStore(name: string): Promise<IPuppeteerCookieStore|null> {
+        let agg = PuppeteerCookieStore.aggregate();
+        agg.match({
+            name
         });
-        return await PuppeteerCookieStore.findOne({ name, url }).exec();
+
+        agg.unwind('$cookies');
+        agg.group({
+            _id: 'name',
+            cookies: {
+                $addToSet: '$cookies'
+            }
+        });
+
+        let cookies = await agg.exec();
+        return cookies[0];
     }
 
     public async get(location: ILocation): Promise<IHTTPResponse|null> {
@@ -76,15 +85,24 @@ export default class HTTPPuppeteerProxyDriverBase implements IDriverGet<IHTTPRes
             ...(location.driverOptions || {})
         };
 
-        let cookieStore = options.cookieStoreName ? await this.getCookieStore(options.cookieStoreName, entity.source.href) : null;
+        let cookieStore = options.cookieStoreName ? await this.getCookieStore(options.cookieStoreName) : null;
 
+        let sourceHref = URL.parse(entity.source.href);
         if (cookieStore) {
-            await page.setCookie(...cookieStore.cookies);
+            let cookies = cookieStore.cookies.map((c: any) => {
+                return {
+                    ...c,
+                    domain: sourceHref.host,
+                    path: sourceHref.path
+                };
+            });
+            await page.setCookie(...cookies);
         }
 
         await page.goto(entity.source.href, {
              waitUntil: 'networkidle0'
         });
+
 
         let result: IHTTPResponse = null;
         if (options.exportType === HTTPPuppeteerProxyDriverExportTypes.mhtml) {

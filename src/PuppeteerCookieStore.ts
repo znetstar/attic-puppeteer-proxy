@@ -14,7 +14,6 @@ const mongoose = ApplicationContext.mongoose as Mongoose;
 export interface IPuppeteerCookieStoreBase {
     id?: string;
     _id?: string;
-    url: string;
     cookies: any;
     profile?: string;
     name: string;
@@ -23,7 +22,6 @@ export interface IPuppeteerCookieStoreBase {
 export interface IPuppeteerCookieStoreModel {
     id: ObjectId;
     _id: ObjectId;
-    url: string;
     cookies: any;
     profile?: string;
     name: string;
@@ -34,10 +32,6 @@ export type IPuppeteerCookieStore = IPuppeteerCookieStoreBase&IPuppeteerCookieSt
 
 // @ts-ignore
 export const PuppeteerCookieStoreSchema = <Schema<IPuppeteerCookieStore>>(new (require('mongoose').Schema)({
-    url: {
-        type: String,
-        required: true
-    },
     cookies: {
         type: mongoose.Schema.Types.Mixed,
         required: true
@@ -59,18 +53,32 @@ let rpcMethods: IRPCCookieStore = ApplicationContext.rpcServer.methods as IRPCCo
 
 rpcMethods.setPuppeteerCookieStore = async function (cookieStore: IPuppeteerCookieStoreBase): Promise<void> {
     await PuppeteerCookieStore.updateOne({
-        name: cookieStore.name,
-        url: cookieStore.url
+        name: cookieStore.name
     }, {
         $set: {
             name: cookieStore.name,
-            url: cookieStore.url,
             profile: cookieStore.profile,
             cookies: cookieStore.cookies
         }
     }, {
         upsert: true
     });
+}
+
+rpcMethods.setPuppeteerCookieStores = async function (cookieStores: IPuppeteerCookieStoreBase[]): Promise<void> {
+    for (let cookieStore of cookieStores) {
+        await PuppeteerCookieStore.updateOne({
+            name: cookieStore.name
+        }, {
+            $set: {
+                name: cookieStore.name,
+                profile: cookieStore.profile,
+                cookies: cookieStore.cookies
+            }
+        }, {
+            upsert: true
+        });
+    }
 }
 
 

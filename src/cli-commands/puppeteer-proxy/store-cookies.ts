@@ -5,20 +5,18 @@ import Config from "@znetstar/attic-cli-common/lib/Config";
 import {IRPC} from "@znetstar/attic-common";
 import {IRPCCookieStore} from "../../IRPCCookieStoreExt";
 import {IPuppeteerCookieStoreBase} from "../../PuppeteerCookieStore";
-const chrome = require('chrome-cookies-secure');
+const chrome = require('@znetstar/chrome-cookies-secure');
 
 let StoreCookieRPCProxy: IRPCCookieStore = RPCProxy as IRPCCookieStore;
 
 export default class StoreCookies extends Command {
+    static aliases = [ 'sc' ];
+
     static description = 'shortens an existing URI, returning the new short url'
 
 
     static flags = {
         help: flags.help({char: 'h'}),
-        url: flags.string({
-            char: 'r',
-            required: true
-        }),
         profile: flags.string({
             char: 'p',
             required: false
@@ -44,23 +42,23 @@ export default class StoreCookies extends Command {
         await this.config.runHook('config', {});
         const {args, flags} = this.parse(StoreCookies);
 
-        let cookies: any  = await new Promise((resolve, reject) => {
-            chrome.getCookies(flags.url, 'puppeteer', (err: any, cookies: any) => {
+        let cookies: any = await new Promise((resolve, reject) => {
+            chrome.getCookies('puppeteer', (err: any, cookies: any) => {
                 if (err) reject(err);
                 else resolve(cookies);
             });
         });
 
+
         let cookieStore: IPuppeteerCookieStoreBase = {
             cookies,
-            profile: flags.profile,
-            url: flags.url,
-            name: flags.name
-        };
+            name: flags.name,
+            profile: flags.profile
+        }
 
         await StoreCookieRPCProxy.setPuppeteerCookieStore(cookieStore);
 
-        let outString = formatOutputFromFlags(cookieStore, flags, [ 'url', 'name', 'profile' ])
+        let outString = formatOutputFromFlags(cookieStore, flags, [ 'name', 'profile' ])
 
         console.log(outString);
     }

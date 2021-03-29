@@ -1,6 +1,6 @@
 {
     "name": "@znetstar/attic-puppeteer-proxy",
-    "version": "3.0.7",
+    "version": "3.0.17",
     "description": "A plugin for puppeteer-proxy on attic",
     "main": "lib/Atticfile.js",
     "publishConfig": {
@@ -44,10 +44,10 @@
         "grunt-ts": "^6.0.0-beta.22",
         "grunt-typedoc": "^0.2.4",
         "mongoose": "^5.12.2",
+        "puppeteer": "^8.0.0",
         "ts-node": "^9.1.1",
         "typedoc": "^0.20.33",
-        "typescript": "^4.2.3",
-        "puppeteer": "^8.0.0"
+        "typescript": "^4.2.3"
     },
     "homepage": "https://github.com/znetstar/attic-puppeteer-proxy#readme",
     "peerDependencies": {
@@ -58,8 +58,10 @@
     },
     "dependencies": {
         "@oclif/command": "^1.8.0",
+        "@znetstar/chrome-cookies-secure": "^1.3.3",
         "chrome-cookies-secure": "^1.3.2",
         "node-fetch": "^2.6.1",
+        "semver": "^7.3.5",
         "tslib": "^2.0.1"
     },
     "oclif": {

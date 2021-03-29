@@ -18,9 +18,10 @@ export class AtticServerPuppeteerProxy implements IPlugin {
     public async init(): Promise<void> {
         let config: AtticPuppeteerProxyConfig = this.applicationContext.config as AtticPuppeteerProxyConfig;
         const browser = await puppeteer.launch({
-            ...(config.puppeteerOptions || {}),
-            headless: true
+            headless: true,
+            ...(config.puppeteerOptions || {})
         });
+
 
         require('./PuppeteerCookieStore');
 
