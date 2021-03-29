@@ -1,4 +1,5 @@
-import IConfig, {IApplicationContext, IPlugin} from "@znetstar/attic-common/lib/Server";
+import {IApplicationContext, IPlugin} from "@znetstar/attic-common/lib/Server/index";
+import IConfig from "@znetstar/attic-common/lib/Server/IConfig";
 import HTTPPuppeteerProxyDriver from "./HTTPPuppeteerProxyDriver";
 import * as puppeteer from "puppeteer";
 import {LaunchOptions} from "puppeteer";
@@ -7,13 +8,15 @@ interface ConfigExt {
     puppeteerOptions: LaunchOptions
 }
 
+export type AtticPuppeteerProxyConfig =  IConfig&ConfigExt;
+
 export class AtticServerPuppeteerProxy implements IPlugin {
     constructor(public applicationContext: IApplicationContext) {
 
     }
 
     public async init(): Promise<void> {
-        let config: IConfig&ConfigExt = this.applicationContext.config;
+        let config: AtticPuppeteerProxyConfig = this.applicationContext.config as AtticPuppeteerProxyConfig;
         const browser = await puppeteer.launch({
             ...(config.puppeteerOptions || {}),
             headless: true
