@@ -82,7 +82,9 @@ export default class HTTPPuppeteerProxyDriverBase implements IDriverGet<IHTTPRes
             await page.setCookie(...cookieStore.cookies);
         }
 
-        await page.goto(entity.source.href);
+        await page.goto(entity.source.href, {
+             waitUntil: 'networkidle0'
+        });
 
         let result: IHTTPResponse = null;
         if (options.exportType === HTTPPuppeteerProxyDriverExportTypes.mhtml) {
