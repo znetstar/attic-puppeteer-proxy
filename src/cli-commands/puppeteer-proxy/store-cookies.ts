@@ -49,16 +49,20 @@ export default class StoreCookies extends Command {
             });
         });
 
+        let results: any[] = [];
+        for (let cookie of cookies) {
+            let cookieStore: IPuppeteerCookieStoreBase = {
+                key: cookie.name,
+                cookie,
+                name: flags.name,
+                profile: flags.profile
+            }
 
-        let cookieStore: IPuppeteerCookieStoreBase = {
-            cookies,
-            name: flags.name,
-            profile: flags.profile
+            await StoreCookieRPCProxy.storePuppeteerCookie(cookieStore);
+            results.push(cookieStore);
         }
 
-        await StoreCookieRPCProxy.setPuppeteerCookieStore(cookieStore);
-
-        let outString = formatOutputFromFlags(cookieStore, flags, [ 'name', 'profile' ])
+        let outString = formatOutputFromFlags(results, flags, [ 'name', 'key', 'profile' ])
 
         console.log(outString);
     }

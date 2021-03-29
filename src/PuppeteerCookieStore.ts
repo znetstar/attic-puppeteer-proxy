@@ -14,17 +14,19 @@ const mongoose = ApplicationContext.mongoose as Mongoose;
 export interface IPuppeteerCookieStoreBase {
     id?: string;
     _id?: string;
-    cookies: any;
+    cookie: any;
     profile?: string;
     name: string;
+    key: string;
 }
 
 export interface IPuppeteerCookieStoreModel {
     id: ObjectId;
     _id: ObjectId;
-    cookies: any;
+    cookie: any;
     profile?: string;
     name: string;
+    key: string;
 }
 
 export type IPuppeteerCookieStore = IPuppeteerCookieStoreBase&IPuppeteerCookieStoreModel;
@@ -32,7 +34,7 @@ export type IPuppeteerCookieStore = IPuppeteerCookieStoreBase&IPuppeteerCookieSt
 
 // @ts-ignore
 export const PuppeteerCookieStoreSchema = <Schema<IPuppeteerCookieStore>>(new (require('mongoose').Schema)({
-    cookies: {
+    cookie: {
         type: mongoose.Schema.Types.Mixed,
         required: true
     },
@@ -43,6 +45,10 @@ export const PuppeteerCookieStoreSchema = <Schema<IPuppeteerCookieStore>>(new (r
     name: {
         type: String,
         required: true
+    },
+    key: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: true,
@@ -51,40 +57,36 @@ export const PuppeteerCookieStoreSchema = <Schema<IPuppeteerCookieStore>>(new (r
 
 let rpcMethods: IRPCCookieStore = ApplicationContext.rpcServer.methods as IRPCCookieStore;
 
-rpcMethods.setPuppeteerCookieStore = async function (cookieStore: IPuppeteerCookieStoreBase): Promise<void> {
+rpcMethods.storePuppeteerCookie = async function (cookieStore: IPuppeteerCookieStoreBase): Promise<void> {
     await PuppeteerCookieStore.updateOne({
-        name: cookieStore.name
+        name: cookieStore.name,
+        'cookie.name': cookieStore.cookie.name,
+        'cookie.domain': cookieStore.cookie.domain,
+        'cookie.path': cookieStore.cookie.path
     }, {
         $set: {
             name: cookieStore.name,
             profile: cookieStore.profile,
-            cookies: cookieStore.cookies
+            cookie: cookieStore.cookie,
+            key: cookieStore.key
         }
     }, {
         upsert: true
     });
 }
 
-rpcMethods.setPuppeteerCookieStores = async function (cookieStores: IPuppeteerCookieStoreBase[]): Promise<void> {
-    for (let cookieStore of cookieStores) {
-        await PuppeteerCookieStore.updateOne({
-            name: cookieStore.name
-        }, {
-            $set: {
-                name: cookieStore.name,
-                profile: cookieStore.profile,
-                cookies: cookieStore.cookies
-            }
-        }, {
-            upsert: true
-        });
-    }
-}
+PuppeteerCookieStoreSchema.index({
+    name: 1,
+    'cookie.domain': 1
+
+}, {});
 
 
 PuppeteerCookieStoreSchema.index({
     name: 1,
-    url: 1
+    'cookie.name': 1,
+    'cookie.domain': 1,
+    'cookie.path': 1,
 }, {
     unique: true
 });
